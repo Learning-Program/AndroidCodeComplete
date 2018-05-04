@@ -1,0 +1,41 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.novoda.bintray-release'
+
+android {
+    compileSdkVersion compile_sdk_version
+
+    compileOptions {
+        sourceCompatibility = source_java_version
+        targetCompatibility = target_java_version
+    }
+
+    defaultConfig {
+        minSdkVersion min_sdk_version
+        targetSdkVersion target_sdk_version
+
+        versionCode log_version_code
+        versionName log_version_name
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compileOnly 'com.android.support:appcompat-v7:27.1.1'
+}
+
+publish {
+    userOrg = 'codecomplete'
+    groupId = 'code.complete'
+    artifactId = 'log'
+    publishVersion = log_version_name
+    desc = 'This is a android logcat utils'
+    website = 'https://github.com/Learning-Program/AndroidCodeComplete'
+}
+
+

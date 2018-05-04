@@ -1,0 +1,43 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    // global variables definition
+    ext.compile_sdk_version = 27
+    ext.min_sdk_version = 15
+    ext.target_sdk_version = 25
+    ext.kotlin_version = '1.2.30'
+    // jdk
+    ext.source_java_version = JavaVersion.VERSION_1_8
+    ext.target_java_version = JavaVersion.VERSION_1_8
+
+    // library version info
+    ext.log_version_code = 2
+    ext.log_version_name = '0.1.2'
+
+    repositories {
+        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/'}
+        google()
+        jcenter()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.1.2'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.novoda:bintray-release:+'
+    }
+}
+
+allprojects {
+    repositories {
+        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/'}
+        google()
+        jcenter()
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+        maven { url 'http://dl.bintray.com/codecomplete/maven' }
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
