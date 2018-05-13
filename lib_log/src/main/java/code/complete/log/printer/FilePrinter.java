@@ -1,6 +1,7 @@
 package code.complete.log.printer;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.io.BufferedWriter;
@@ -13,12 +14,13 @@ import java.util.Locale;
 
 import code.complete.log.LogInfo;
 import code.complete.log.LogPrinter;
+import code.complete.log.LogPriority;
 
 /**
  * 输出到文件的Printer
  * @author imkarl
  */
-public final class FilePrinter implements LogPrinter {
+public class FilePrinter implements LogPrinter {
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.getDefault());
 
@@ -26,6 +28,11 @@ public final class FilePrinter implements LogPrinter {
 
     public FilePrinter(File file, boolean append) throws IOException {
         writer = new BufferedWriter(new FileWriter(file, append));
+    }
+
+    @Override
+    public boolean isLoggable(@LogPriority int priority, @NonNull String tag, @Nullable Object message) {
+        return true;
     }
 
     @Override

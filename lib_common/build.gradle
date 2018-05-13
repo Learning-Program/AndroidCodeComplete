@@ -1,0 +1,45 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.novoda.bintray-release'
+
+android {
+    compileSdkVersion compile_sdk_version
+
+    compileOptions {
+        sourceCompatibility = source_java_version
+        targetCompatibility = target_java_version
+    }
+
+    defaultConfig {
+        minSdkVersion min_sdk_version
+        targetSdkVersion target_sdk_version
+        versionCode common_version_code
+        versionName common_version_name
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    lintOptions {
+        abortOnError false
+    }
+}
+
+dependencies {
+    compileOnly project(':lib_log')
+    implementation 'org.jooq:joor-java-8:0.9.8'
+    implementation 'me.drakeet.support:toastcompat:1.0.2'
+    compileOnly 'com.android.support:support-annotations:27.1.1'
+    compileOnly 'com.android.support:support-v4:27.1.1'
+}
+
+
+publish {
+    userOrg = 'codecomplete'
+    groupId = 'code.complete'
+    artifactId = 'common'
+    publishVersion = common_version_name
+    desc = 'This is a android common utils'
+    website = 'https://github.com/Learning-Program/AndroidCodeComplete'
+}

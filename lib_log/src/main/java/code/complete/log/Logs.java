@@ -5,7 +5,12 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import code.complete.log.formatter.SimpleFormatter;
 import code.complete.log.printer.AndroidPrinter;
@@ -19,7 +24,7 @@ public final class Logs {
     // 全局TAG
     private static String sGlobalTag = "CodeComplete";
     // 日志打印器
-    private static LogPrinter sPrinter = new AndroidPrinter(true);
+    private static Set<LogPrinter> sPrinters = new HashSet<>(Collections.singletonList(new AndroidPrinter()));
     // 日志格式化工具
     private static LogFormatter sFormatter = new SimpleFormatter();
     // 内部调用者
@@ -77,9 +82,18 @@ public final class Logs {
      * @param message 日志内容
      */
     public static void println(@LogPriority int priority, @NonNull String tag, @Nullable Object message) {
-        final LogInfo info = LogInfo.obtain(priority, tag, Thread.currentThread(), sInnerCallerNames);
-        sPrinter.println(info, sFormatter.format(message));
-        info.recycle();
+        LogInfo info = null;
+        for (LogPrinter printer : sPrinters) {
+            if (printer != null && printer.isLoggable(priority, tag, message)) {
+                if (info == null) {
+                    info = LogInfo.obtain(priority, tag, Thread.currentThread(), sInnerCallerNames);
+                }
+                printer.println(info, sFormatter.format(message));
+            }
+        }
+        if (info != null) {
+            info.recycle();
+        }
     }
 
     /**
@@ -96,7 +110,12 @@ public final class Logs {
      */
     public static void printlnCallerStackTrace(@LogPriority int priority, @NonNull String tag) {
         final LogInfo info = LogInfo.obtain(priority, tag, Thread.currentThread(), sInnerCallerNames);
-        sPrinter.println(info, sFormatter.format(info.getCallerStackTrace()));
+        final StackTraceElement[] message = info.getCallerStackTrace();
+        for (LogPrinter printer : sPrinters) {
+            if (printer != null && printer.isLoggable(priority, tag, message)) {
+                printer.println(info, sFormatter.format(message));
+            }
+        }
         info.recycle();
     }
 
@@ -111,8 +130,22 @@ public final class Logs {
     /**
      * 设置打印器
      */
-    public static void setPrinter(@NonNull LogPrinter printer) {
-        sPrinter = printer;
+    public static void setPrinters(@NonNull LogPrinter... printers) {
+        sPrinters.clear();
+        //noinspection ConstantConditions
+        if (printers != null && printers.length > 0) {
+            sPrinters.addAll(Arrays.asList(printers));
+        }
+    }
+    /**
+     * 设置打印器
+     */
+    public static void setPrinters(@NonNull Collection<LogPrinter> printers) {
+        sPrinters.clear();
+        //noinspection ConstantConditions
+        if (printers != null && !printers.isEmpty()) {
+            sPrinters.addAll(printers);
+        }
     }
     /**
      * 设置格式化工具
@@ -127,7 +160,9 @@ public final class Logs {
         sInnerCallerNames.clear();
         if (callers != null) {
             for (Class caller : callers) {
-                sInnerCallerNames.add(caller.getName());
+                if (caller != null) {
+                    sInnerCallerNames.add(caller.getName());
+                }
             }
         }
     }

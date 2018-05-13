@@ -1,6 +1,7 @@
 package code.complete.log.printer;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import code.complete.log.LogInfo;
 import code.complete.log.LogPrinter;
@@ -10,16 +11,23 @@ import code.complete.log.LogPriority;
  * Android Logcat Printer
  * @author imkarl
  */
-public final class AndroidPrinter implements LogPrinter {
+public class AndroidPrinter implements LogPrinter {
 
     // 单行最大输出长度
     private static final int MAX_LINE_LENGTH = 3000;
     // 是否需要间隔变化TAG
     private static boolean shouldSplitTag = true;
 
-    private final boolean isShowThread;
-    public AndroidPrinter(boolean showThread) {
-        this.isShowThread = showThread;
+    @Override
+    public boolean isLoggable(@LogPriority int priority, @NonNull String tag, @Nullable Object message) {
+        return true;
+    }
+
+    /**
+     * 是否应该显示线程信息
+     */
+    public boolean shouldShowThread() {
+        return true;
     }
 
     @Override
@@ -27,7 +35,7 @@ public final class AndroidPrinter implements LogPrinter {
         String tag = info.getTag();
 
         StringBuilder describe = new StringBuilder(info.getCallerString());
-        if (isShowThread) {
+        if (shouldShowThread()) {
             describe.append('\t').append("[Thread: ").append(info.getThreadName()).append(']');
         }
         log(info.getPriority(), tag, describe.toString());
